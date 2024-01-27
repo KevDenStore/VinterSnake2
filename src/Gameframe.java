@@ -13,5 +13,12 @@ public class Gameframe extends JFrame {
         this.pack();
         this.setVisible(true);
         this.setLocationRelativeTo(null);
+        openSettings();
+    }
+    private void openSettings() {
+        SettingsFrame settingsFrame = new SettingsFrame(this, panel);
+        settingsFrame.setLocationRelativeTo(this);
+        settingsFrame.setVisible(true);
+        settingsFrame.requestFocusInWindow();
     }
 }

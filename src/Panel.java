@@ -4,15 +4,24 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.Random;
 
-public class Panel extends JPanel implements ActionListener{
+public class Panel extends JPanel implements ActionListener {
     //skärm variablar
     private static final long serialVersionUID = 1L;
+    private static int unitSize = 18;  // Default unit size
+
+    public static int getUnitSize() {
+        return unitSize;
+    }
+
+    public static void setUnitSize(int newSize) {
+        unitSize = newSize;
+    }
 
     static final int WIDTH = 600;
     static final int HEIGHT = 600;
     static final int UNIT_SIZE = 18;
     static final int NUMBER_OF_UNITS = (WIDTH * HEIGHT) / (UNIT_SIZE * UNIT_SIZE);
-
+// ny objekt
     final int x [] = new int[NUMBER_OF_UNITS]; //håller x,y kordinater för kroppen av ormen
     final int y [] = new int[NUMBER_OF_UNITS];
     //ormens längd
@@ -34,7 +43,7 @@ public class Panel extends JPanel implements ActionListener{
         this.addKeyListener(new MyKeyAdapter());
         play();
     }
-
+//ny objekt
     public void play() {
         addFood();
         running = true;
@@ -47,6 +56,7 @@ public class Panel extends JPanel implements ActionListener{
         draw(graphics);
 
     }
+    //ny objekt
     public void move (){
         for (int i = lenght; i > 0; i--) {
             //flytta ormen en enhet mot önskad rikting för att spela
@@ -63,6 +73,7 @@ public class Panel extends JPanel implements ActionListener{
             y[0] = y[0] + UNIT_SIZE;
         }
     }
+    //objekt controller
     public void checkFood() {
         if (x[0] == foodX && y[0] == foodY) {
             lenght++;
