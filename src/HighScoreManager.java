@@ -1,25 +1,27 @@
-// Förbättringar i HighScoreManager.java
-import java.io.*;
-import java.nio.file.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class HighScoreManager {
     private static final String HIGHSCORE_FILE = "highscore.txt";
 
     public static int loadHighScore() {
-        try {
-            String content = new String(Files.readAllBytes(Paths.get(HIGHSCORE_FILE)));
-            return Integer.parseInt(content.trim());
+        try (BufferedReader reader = new BufferedReader(new FileReader(HIGHSCORE_FILE))) {
+            String line = reader.readLine();
+            return Integer.parseInt(line.trim());
         } catch (IOException | NumberFormatException e) {
-            return 0; // Ingen highscore finns, returnera 0
+            System.err.println("Failed to load high score: " + e.getMessage());
+            return 0;
         }
     }
 
     public static void saveHighScore(int score) {
-        try (PrintWriter out = new PrintWriter(new FileWriter(HIGHSCORE_FILE))) {
-            out.println(score);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(HIGHSCORE_FILE))) {
+            writer.write(String.valueOf(score));
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Failed to save high score: " + e.getMessage());
         }
     }
 }
-
