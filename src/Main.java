@@ -8,6 +8,5 @@ public class Main {
         //String[] args: Tar emot argument från kommandoraden som programmet kan använda.
 
         new GameFrame();         // Skapar ett nytt fönster för spelet, vilket också startar spelet
-
     }
 }

@@ -1,72 +1,82 @@
-import java.awt.Color; // Importerar Color-klassen för färgsättning.
-import java.awt.Graphics; // Importerar Graphics-klassen för grafisk rendering.
-import java.awt.Point; // Importerar Point-klassen för att representera ormens segmentpositioner.
-import java.util.ArrayList; // Importerar ArrayList-klassen för att hantera ormens segment.
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.util.ArrayList;
 
-// Klassen för ormen i spelet
 public class Snake extends GameObject {
-    private ArrayList<Point> body; // Ormens kropp representerad av en lista med punkter.
-    private Direction direction; // Nuvarande riktning för ormens rörelse.
-    private boolean growing = false; // Flagga för om ormen är i växande tillstånd.
+    private ArrayList<Point> body;
+    private Direction direction;
+    private boolean growing = false;
 
-    // Enum för att definiera möjliga rörelseriktningar.
     public enum Direction {
         UP, DOWN, LEFT, RIGHT
     }
 
     public Snake(int x, int y, int initialSize) {
-        super(x, y); // Anropar GameObject-konstruktorn.
-        body = new ArrayList<>(); // Initierar kroppens lista.
-        direction = Direction.RIGHT; // Sätter standardriktning till höger.
-        // Initierar ormens kropp baserat på angiven startstorlek.
+        super(x, y);
+        body = new ArrayList<>();
+        direction = Direction.RIGHT;
         for (int i = 0; i < initialSize; i++) {
-            body.add(new Point(x - i * 20, y)); // Lägger till segment i ormens kropp.
+            body.add(new Point(x - i * 20, y));
         }
     }
 
     public void setDirection(Direction newDirection) {
-        // Kontrollerar att den nya riktningen inte är motsatt till den nuvarande för att undvika att ormen går in i sig själv.
-        if (Math.abs(direction.ordinal() - newDirection.ordinal()) % 2 != 0) {
+        if ((direction == Direction.UP && newDirection != Direction.DOWN) ||
+                (direction == Direction.DOWN && newDirection != Direction.UP) ||
+                (direction == Direction.LEFT && newDirection != Direction.RIGHT) ||
+                (direction == Direction.RIGHT && newDirection != Direction.LEFT)) {
             this.direction = newDirection;
         }
     }
 
-    public Point getHead() { // Returnerar positionen för ormens huvud.
+    public Point getHead() {
         return body.get(0);
     }
 
-    public ArrayList<Point> getBody() { // Returnerar hela kroppen.
+    public ArrayList<Point> getBody() {
         return body;
     }
 
-    public void move() { // Flyttar ormen i den angivna riktningen.
-        Point head = getHead(); // Hämtar nuvarande huvud.
-        Point newHead = new Point(head); // Skapar en kopia av huvudet för att flytta.
-
-        // Flyttar det nya huvudet baserat på riktningen.
+    public void move() {
+        Point head = getHead();
+        Point newHead = new Point(head);
         switch (direction) {
-            case UP:    newHead.y -= 20; break;
-            case DOWN:  newHead.y += 20; break;
-            case LEFT:  newHead.x -= 20; break;
-            case RIGHT: newHead.x += 20; break;
+            case UP:
+                newHead.y -= 20;
+                break;
+            case DOWN:
+                newHead.y += 20;
+                break;
+            case LEFT:
+                newHead.x -= 20;
+                break;
+            case RIGHT:
+                newHead.x += 20;
+                break;
         }
-
-        body.add(0, newHead); // Lägger till det nya huvudet i början av listan.
+        body.add(0, newHead);
         if (!growing) {
-            body.remove(body.size() - 1); // Tar bort det sista segmentet om ormen inte växer.
+            body.remove(body.size() - 1);
+        } else {
+            growing = false;
         }
-        growing = false; // Återställer växttillståndet till false.
     }
 
-    public void setGrowing(boolean growing) { // Sätter om ormen ska växa eller inte.
+    public void setGrowing(boolean growing) {
         this.growing = growing;
     }
 
+    public boolean intersects(Food food) {
+        Point head = getHead();
+        return head.equals(food.getPosition());
+    }
+
     @Override
-    public void draw(Graphics g) { // Ritar ut ormen på spelbrädet.
-        g.setColor(Color.GREEN); // Ställer in färgen för ormens segment.
+    public void draw(Graphics g) {
+        g.setColor(Color.GREEN);
         for (Point segment : body) {
-            g.fillRect(segment.x, segment.y, 20, 20); // Ritar varje segment av ormen.
+            g.fillRect(segment.x, segment.y, 20, 20);
         }
     }
 }
