@@ -1,6 +1,4 @@
-import javax.swing.JFrame;
-
-// Spelfönstret som innehåller spelets huvudsakliga GUI-komponenter
+import javax.swing.JFrame; // Spelfönstret som innehåller spelets huvudsakliga GUI-komponenter
 public class GameFrame extends JFrame {
     public GameFrame() {
         this.setTitle("Snake Game"); // Titeln på fönstret

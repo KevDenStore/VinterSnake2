@@ -1,23 +1,20 @@
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Color; // Importerar Color-klassen för att hantera färger.
+import java.awt.Graphics; // Importerar Graphics-klassen för ritning.
 
-public class RegularFood extends Food {
-    public RegularFood(int x, int y) {
-        super(x, y);
-    }
-
-    // Make sure this method signature exactly matches the one it overrides in Food (if Food defines it)
-    // or GameObject (if it's abstract there).
-    @Override
-    public void effect(Snake snake) {
-        // Assuming the effect of this food is to make the snake grow,
-        // this method should contain logic to handle that.
-        snake.setGrowing(true);
+public class RegularFood extends Food { // Definierar klassen RegularFood som ärver från Food.
+    public RegularFood(int x, int y) { // Konstruktor som tar positionen för maten.
+        super(x, y); // Anropar Food-klassens konstruktor med position.
     }
 
     @Override
-    public void draw(Graphics g) {
-        g.setColor(Color.RED); // Sets the color for drawing
-        g.fillRect(x, y, SIZE, SIZE); // Draws a rectangle (in this case, the food) on the screen
+    public void effect(Snake snake) { // Implementerar effekten av att äta denna mat.
+        snake.setGrowing(true); // Sätter ormen i växande tillstånd.
+    }
+
+    @Override
+    public void draw(Graphics g) { // Implementerar hur maten ritas ut.
+        g.setColor(Color.RED); // Ställer in färgen till röd för ritningen.
+        g.fillRect(x, y, SIZE, SIZE); // Ritar en fyrkant på matens position med given storlek.
     }
 }
+

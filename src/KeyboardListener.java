@@ -1,5 +1,6 @@
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter; //Gör KeyAdapter tillgänglig för tangenthändelser
+import java.awt.event.KeyEvent; //Gör KeyEvent tillgänglig för detaljer om tangenttryck.
+
 
 // En anpassad KeyAdapter för att hantera ormens rörelse via tangentbordet
 public class KeyboardListener extends KeyAdapter {
@@ -7,13 +8,14 @@ public class KeyboardListener extends KeyAdapter {
 
     // Konstruktor som tar en orminstans
     public KeyboardListener(Snake snake) {
-        this.snake = snake;
+        this.snake = snake; //Konstruktor som kopplar en Snake-instans till lyssnaren.
     }
 
-    // Hanterar tangenttryckningar för att ändra riktning på ormen
-    @Override
+    // Hanterar tangenttryckningar för att ändrariktning på ormen
+    @Override // Överskriver metod för att hantera tangenttryckningar.
     public void keyPressed(KeyEvent e) {
-        switch (e.getKeyCode()) {
+        switch (e.getKeyCode()) { // switch funktion som Kontrollerar vilken tangent som
+            // tryckts och utför åtgärd baserat på detta, exempelvis ändrar riktning på ormen.
             case KeyEvent.VK_UP:    snake.setDirection(Snake.Direction.UP);    break;
             case KeyEvent.VK_DOWN:  snake.setDirection(Snake.Direction.DOWN);  break;
             case KeyEvent.VK_LEFT:  snake.setDirection(Snake.Direction.LEFT);  break;
