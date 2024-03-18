@@ -2,16 +2,13 @@ import javax.swing.JFrame;
 
 public class GameFrame extends JFrame {
     public GameFrame() {
-        this.add(new GameBoard());
         this.setTitle("Snake Game");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
-        this.pack(); // Anpassar fönsterstorleken efter komponenterna
+        this.add(new GameBoard());
+        this.pack(); // Anpassar storleken efter komponenterna
+        this.setLocationRelativeTo(null); // Centrerar fönstret på skärmen
         this.setVisible(true);
-        this.setLocationRelativeTo(null); // Centrerar fönstret
-    }
-
-    public static void main(String[] args) {
-        new GameFrame(); // Skapar och visar spelets fönster
+        this.setResizable(false);
     }
 }

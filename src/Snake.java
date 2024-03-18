@@ -1,12 +1,14 @@
-import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 
 public class Snake extends GameObject {
     private ArrayList<Point> body;
+    private int bodySize;
     private Direction direction;
     private boolean growing = false;
+    private boolean rainbow;
 
     public enum Direction {
         UP, DOWN, LEFT, RIGHT
@@ -14,18 +16,18 @@ public class Snake extends GameObject {
 
     public Snake(int x, int y, int initialSize) {
         super(x, y);
-        body = new ArrayList<>();
-        direction = Direction.RIGHT;
+        this.bodySize = 20;
+        this.body = new ArrayList<>();
+        this.direction = Direction.RIGHT;
+
         for (int i = 0; i < initialSize; i++) {
-            body.add(new Point(x - i * 20, y));
+            body.add(new Point(x, y - i * bodySize));
         }
     }
 
     public void setDirection(Direction newDirection) {
-        if ((direction == Direction.UP && newDirection != Direction.DOWN) ||
-                (direction == Direction.DOWN && newDirection != Direction.UP) ||
-                (direction == Direction.LEFT && newDirection != Direction.RIGHT) ||
-                (direction == Direction.RIGHT && newDirection != Direction.LEFT)) {
+        this.direction = newDirection; // Enkel riktningsändring
+        if (Math.abs(direction.ordinal() - newDirection.ordinal()) % 2 != 0) {
             this.direction = newDirection;
         }
     }
@@ -39,27 +41,19 @@ public class Snake extends GameObject {
     }
 
     public void move() {
-        Point head = getHead();
-        Point newHead = new Point(head);
+        Point newHead = new Point(getHead());
         switch (direction) {
-            case UP:
-                newHead.y -= 20;
-                break;
-            case DOWN:
-                newHead.y += 20;
-                break;
-            case LEFT:
-                newHead.x -= 20;
-                break;
-            case RIGHT:
-                newHead.x += 20;
-                break;
+            case UP: newHead.y -= bodySize; break;
+            case DOWN: newHead.y += bodySize; break;
+            case LEFT: newHead.x -= bodySize; break;
+            case RIGHT: newHead.x += bodySize; break;
         }
-        body.add(0, newHead);
-        if (!growing) {
-            body.remove(body.size() - 1);
+
+        body.add(0, newHead); // Lägg till nytt huvud
+        if (growing) {
+            growing = false; // Återställ växtflaggan
         } else {
-            growing = false;
+            body.remove(body.size() - 1); // Ta bort sista segmentet endast om ormen inte växer
         }
     }
 
@@ -67,16 +61,23 @@ public class Snake extends GameObject {
         this.growing = growing;
     }
 
-    public boolean intersects(Food food) {
-        Point head = getHead();
-        return head.equals(food.getPosition());
+    public void setRainbow(boolean rainbow) {
+        this.rainbow = rainbow;
     }
 
     @Override
     public void draw(Graphics g) {
-        g.setColor(Color.GREEN);
+        Color[] colors = {Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.BLUE, Color.MAGENTA};
+        int colorIndex = 0;
+
         for (Point segment : body) {
-            g.fillRect(segment.x, segment.y, 20, 20);
+            if (rainbow) {
+                g.setColor(colors[colorIndex % colors.length]);
+                colorIndex++;
+            } else {
+                g.setColor(Color.GREEN);
+            }
+            g.fillRect(segment.x, segment.y, bodySize, bodySize);
         }
     }
 }
