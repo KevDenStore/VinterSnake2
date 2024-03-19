@@ -7,63 +7,33 @@ public class GameBoard extends JPanel {
     private ArrayList<GameObject> gameObjects;
     private Snake snake;
     private Food food;
-    private Timer gameTimer;
     private final int BOARD_WIDTH = 600;
     private final int BOARD_HEIGHT = 600;
     private int score;
+    private Timer gameTimer;
 
     public GameBoard() {
+        setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
+        setBackground(Color.BLACK); // Optionally set a background color
         initializeGame();
         setFocusable(true);
-        addKeyListener(new KeyboardListener(snake));
-        // Det är viktigt att anropa requestFocusInWindow för att säkerställa att GameBoard tar emot tangentbordsinput.
         requestFocusInWindow();
+        addKeyListener(new KeyboardListener(snake));
     }
 
-    private KeyboardListener keyboardListener; // Antag att detta är en instansvariabel i GameBoard
-
-    public void initializeGame() {
-        // Återställ eller initiera spelvariabler
+    private void initializeGame() {
         score = 0;
-        if (gameObjects != null) {
-            gameObjects.clear(); // Rensa tidigare spelobjekt om listan redan finns
-        } else {
-            gameObjects = new ArrayList<>();
-        }
-
-        // Skapa ormen och maten, lägg till dem i spelobjektslistan
+        gameObjects = new ArrayList<>();
         snake = new Snake(100, 100, 5);
-        food = new RegularFood(0, 0); // Positionen kommer att genereras om i generateFood
+        food = new RegularFood(0, 0); // Initially place the food at the top-left corner
         gameObjects.add(snake);
         gameObjects.add(food);
 
-        // Återstarta eller starta timern
-        if (gameTimer != null) {
-            gameTimer.stop();
-        }
         gameTimer = new Timer(100, e -> gameUpdate());
         gameTimer.start();
 
-        // Återställ/generera matens position
         generateFood();
-
-        // Hantera tangentbordslyssnaren
-        setupKeyboardListener();
-
-        // Be om fokus för att kunna fånga tangentbordshändelser
-        requestFocusInWindow();
     }
-
-    private void setupKeyboardListener() {
-        if (keyboardListener != null) {
-            removeKeyListener(keyboardListener); // Ta bort tidigare lyssnare för att undvika dubbla händelser
-        }
-        keyboardListener = new KeyboardListener(snake);
-        addKeyListener(keyboardListener);
-        setFocusable(true);
-        requestFocusInWindow();
-    }
-
 
     private void generateFood() {
         Random rand = new Random();
@@ -73,7 +43,9 @@ public class GameBoard extends JPanel {
             foodY = rand.nextInt(BOARD_HEIGHT / Food.SIZE) * Food.SIZE;
         } while (snake.getBody().contains(new Point(foodX, foodY)));
 
-        food.setPosition(foodX, foodY); // Uppdaterar matens position
+        // Correctly instantiate RegularFood with the new coordinates
+        food = new RegularFood(foodX, foodY);
+        gameObjects.set(1, food); // Update the food object in your gameObjects list
     }
 
     private void gameUpdate() {
@@ -85,49 +57,32 @@ public class GameBoard extends JPanel {
     private void checkCollisions() {
         Point head = snake.getHead();
 
-        // Kontroll för kollision med spelplanens gränser
+        // Check for collision with walls
         if (head.x < 0 || head.x >= BOARD_WIDTH || head.y < 0 || head.y >= BOARD_HEIGHT) {
-            gameOver();
-            return; // Avsluta metoden här för att undvika ytterligare kontroller efter game over
+            gameTimer.stop();
+            // Implement game over logic here
+            JOptionPane.showMessageDialog(this, "Game Over. Your score: " + score);
+            System.exit(0); // Or reset the game
         }
 
-        // Kontroll för kollision med ormens egen kropp
-        for (int i = 1; i < snake.getBody().size(); i++) { // Börja med index 1 för att hoppa över huvudet
-            Point segment = snake.getBody().get(i);
-            if (head.equals(segment)) {
-                gameOver();
-                return; // Avsluta metoden här för att undvika ytterligare kontroller efter game over
+        // Check for collision with itself
+        for (int i = 1; i < snake.getBody().size(); i++) {
+            if (head.equals(snake.getBody().get(i))) {
+                gameTimer.stop();
+                JOptionPane.showMessageDialog(this, "Game Over. Your score: " + score);
+                System.exit(0); // Or reset the game
+                return;
             }
         }
 
-        // Kontroll för kollision med maten
+        // Check for eating food
         if (head.equals(food.getPosition())) {
             snake.setGrowing(true);
             score++;
-            generateFood();  // Skapa ny mat
+            generateFood();
         }
     }
 
-    private void gameOver() {
-        gameTimer.stop();
-        int highScore = HighScoreManager.loadHighScore();
-        if (score > highScore) {
-            HighScoreManager.saveHighScore(score);
-            JOptionPane.showMessageDialog(this, "New Highscore! Your score: " + score);
-        } else {
-            JOptionPane.showMessageDialog(this, "Game Over. Your score: " + score + "\nHigh Score: " + highScore);
-        }
-        showRestartOption();
-    }
-
-    private void showRestartOption() {
-        int playAgain = JOptionPane.showConfirmDialog(this, "Play again?", "Game Over", JOptionPane.YES_NO_OPTION);
-        if (playAgain == JOptionPane.YES_OPTION) {
-            initializeGame();
-        } else {
-            System.exit(0); // Eller en annan logik för att stänga spelet eller återgå till en huvudmeny
-        }
-    }
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -136,3 +91,4 @@ public class GameBoard extends JPanel {
         }
     }
 }
+
