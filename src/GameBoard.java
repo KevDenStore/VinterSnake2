@@ -10,28 +10,28 @@ public class GameBoard extends JPanel {
     private final int BOARD_WIDTH = 600;
     private final int BOARD_HEIGHT = 600;
     private int score;
+    private int highScore;
     private Timer gameTimer;
 
     public GameBoard() {
+        highScore = HighScoreManager.loadHighScore();
         setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
-        setBackground(Color.BLACK); // Optionally set a background color
+        setBackground(Color.BLACK);
         initializeGame();
         setFocusable(true);
         requestFocusInWindow();
-        addKeyListener(new KeyboardListener(snake));
     }
 
     private void initializeGame() {
         score = 0;
         gameObjects = new ArrayList<>();
         snake = new Snake(100, 100, 5);
-        food = new RegularFood(0, 0); // Initially place the food at the top-left corner
+        food = new RegularFood(0, 0);
         gameObjects.add(snake);
         gameObjects.add(food);
-
+        addKeyListener(new KeyboardListener(snake)); // Re-adding the listener each reset
         gameTimer = new Timer(100, e -> gameUpdate());
         gameTimer.start();
-
         generateFood();
     }
 
@@ -42,10 +42,8 @@ public class GameBoard extends JPanel {
             foodX = rand.nextInt(BOARD_WIDTH / Food.SIZE) * Food.SIZE;
             foodY = rand.nextInt(BOARD_HEIGHT / Food.SIZE) * Food.SIZE;
         } while (snake.getBody().contains(new Point(foodX, foodY)));
-
-        // Correctly instantiate RegularFood with the new coordinates
         food = new RegularFood(foodX, foodY);
-        gameObjects.set(1, food); // Update the food object in your gameObjects list
+        gameObjects.set(1, food);
     }
 
     private void gameUpdate() {
@@ -56,30 +54,29 @@ public class GameBoard extends JPanel {
 
     private void checkCollisions() {
         Point head = snake.getHead();
-
-        // Check for collision with walls
-        if (head.x < 0 || head.x >= BOARD_WIDTH || head.y < 0 || head.y >= BOARD_HEIGHT) {
+        if (head.x < 0 || head.x >= BOARD_WIDTH || head.y < 0 || head.y >= BOARD_HEIGHT ||
+                snake.getBody().stream().anyMatch(segment -> segment != head && segment.equals(head))) {
             gameTimer.stop();
-            // Implement game over logic here
-            JOptionPane.showMessageDialog(this, "Game Over. Your score: " + score);
-            System.exit(0); // Or reset the game
-        }
-
-        // Check for collision with itself
-        for (int i = 1; i < snake.getBody().size(); i++) {
-            if (head.equals(snake.getBody().get(i))) {
-                gameTimer.stop();
-                JOptionPane.showMessageDialog(this, "Game Over. Your score: " + score);
-                System.exit(0); // Or reset the game
-                return;
+            updateHighScore();
+            int playAgain = JOptionPane.showConfirmDialog(this, "Game Over. Your score: " + score +
+                    "\nHigh Score: " + highScore + "\nPlay again?", "Game Over", JOptionPane.YES_NO_OPTION);
+            if (playAgain == JOptionPane.YES_OPTION) {
+                removeAll();
+                initializeGame(); // Reset the game state
+            } else {
+                System.exit(0);
             }
-        }
-
-        // Check for eating food
-        if (head.equals(food.getPosition())) {
+        } else if (head.equals(food.getPosition())) {
             snake.setGrowing(true);
             score++;
             generateFood();
+        }
+    }
+
+    private void updateHighScore() {
+        if (score > highScore) {
+            highScore = score;
+            HighScoreManager.saveHighScore(highScore);
         }
     }
 
@@ -91,4 +88,3 @@ public class GameBoard extends JPanel {
         }
     }
 }
-
